@@ -10,45 +10,66 @@ El objetivo es mejorar la eficiencia, precisión y rapidez del proceso de evalua
 
 Trabajo individual
 
-## ⚙️ Herramientas y Recursos
+<details>
+<summary> ⚙️ Herramientas y Recursos</summary>
 
 - Google BigQuery
 - Google Colab
 - Google Slides
 - Google Looker Studio
 
-## ⚙️ Lenguajes
+</details>
+
+
+<details>
+<summary> ⚙️ Lenguajes</summary>
 
 - SQL / BigQuery
 - Python / Google Colab.
 
-## 📄Conjunto de datos
+</details>
 
-Archivo:
+<details>
+<summary>📄 Conjunto de datos</summary>
 
-- user_ info
-  * user_ id:	Número de identificación del cliente (único para cada cliente)
-  * age:	Edad del cliente
-  * sex:	Sexo del cliente
-  * last_ month_ salary:	Último salario mensual que el cliente reportó al banco
-  * number_dependents:	Número de dependientes
+<details>
+<summary>👤 <strong>- user_info</strong></summary>
 
-- loans_ outstanding
-  * loan_ id:	Número de identificación del préstamo (único para cada préstamo)
-  * user_ id:	Número de identificación del cliente
-  * loan_ type:	Tipo de préstamo (real estate = inmobiliario, others = otro)
+* user_id: Número de identificación del cliente (único para cada cliente)
+* age: Edad del cliente
+* sex: Sexo del cliente
+* last_month_salary: Último salario mensual que el cliente reportó al banco
+* number_dependents: Número de dependientes
+</details>
 
-- loans_ detail
-  * user_ id:	Número de identificación del cliente
-  * more_ 90_ days_ overdue:	Número de veces que el cliente estuvo más de 90 días vencido
-  * using_ lines_ not_ secured_ personal_ assets:	Cuánto está utilizando el cliente en relación con su límite de crédito, en líneas que no están garantizadas con bienes personales, como inmuebles y automóviles
-  * number_ times_ delayed_ payment_ loan_ 30_ 59_ days:	Número de veces que el cliente se retrasó en el pago de un préstamo (entre 30 y 59 días)
-  * debt_ ratio:	Relación entre las deudas y el patrimonio del prestatario. Ratio de deuda = Deudas / Patrimonio
-  * number_ times_ delayed_ payment_ loan_ 60_ 89_ days:	Número de veces que el cliente retrasó el pago de un préstamo (entre 60 y 89 días)
+<details>
+<summary>💰 <strong>- loans_outstanding</strong></summary>
 
-- default
-  * user_ id:	Número de identificación del cliente
-  * default_ flag:	Clasificación de los clientes morosos (1 para clientes que pagan mal, 0 para clientes que pagan bien)
+* loan_id: Número de identificación del préstamo (único para cada préstamo)
+* user_id: Número de identificación del cliente
+* loan_type: Tipo de préstamo (real estate = inmobiliario, others = otro)
+</details>
+
+<details>
+<summary>📑 <strong>- loans_detail</strong></summary>
+
+* user_id: Número de identificación del cliente
+* more_90_days_overdue: Número de veces que el cliente estuvo más de 90 días vencido
+* using_lines_not_secured_personal_assets: Cuánto está utilizando el cliente en relación con su límite de crédito, en líneas que no están garantizadas con bienes personales, como inmuebles y automóviles
+* number_times_delayed_payment_loan_30_59_days: Número de veces que el cliente se retrasó en el pago de un préstamo (entre 30 y 59 días)
+* debt_ratio: Relación entre las deudas y el patrimonio del prestatario. Ratio de deuda = Deudas / Patrimonio
+* number_times_delayed_payment_loan_60_89_days: Número de veces que el cliente retrasó el pago de un préstamo (entre 60 y 89 días)
+</details>
+
+<details>
+<summary>🚩 <strong>- default</strong></summary>
+
+* user_id: Número de identificación del cliente
+* default_flag: Clasificación de los clientes morosos (1 para clientes que pagan mal, 0 para clientes que pagan bien)
+</details>
+
+</details>
+
 
 ### 2. Hito 1
 
@@ -59,5 +80,113 @@ Archivo:
 Objetivo: Utilizar la interfaz de Google BigQuery para crear las 4 tablas (1 por cada archivo)
 
 ## 2.2  Identificar y manejar valores nulos
+
+👤 user_info: 
+  
+  -last_month_salary:7199
+  
+  -number_dependents: 943
+
+```sql
+SELECT
+ COUNTIF(user_id IS NULL) AS user_id_nulos,
+ COUNTIF(age IS NULL) AS age_nulos,
+ COUNTIF(sex IS NULL) AS sex_nulos,
+ COUNTIF(last_month_salary IS NULL) AS last_month_salary_nulos,
+ COUNTIF(number_dependents IS NULL) AS number_dependents_nulos
+FROM `riesgo-relativo-429716.dataset.user_info`;
+```
+![image](https://github.com/user-attachments/assets/a47cd16f-c97d-4a6c-af4a-0ed7bad4c46f)
+
+💰 loans_outstanding : sin nulos
+
+```sql
+SELECT
+ COUNTIF(loan_id IS NULL) AS loan_id_nulos,
+ COUNTIF(user_id IS NULL) AS user_id_nulos,
+ COUNTIF(loan_type IS NULL) AS loan_type_nulos
+FROM `riesgo-relativo-429716.dataset.loans_outstanding`;
+```
+![image](https://github.com/user-attachments/assets/fca73605-af1d-4459-9599-bd0480c40a24)
+
+
+📑 loans_detail
+
+```sql
+SELECT
+ COUNTIF(user_id IS NULL) AS user_id_nulos,
+ COUNTIF(more_90_days_overdue IS NULL) AS more_90_days_overdue_nulos,
+ COUNTIF(using_lines_not_secured_personal_assets IS NULL) AS using_lines_nulos,
+ COUNTIF(number_times_delayed_payment_loan_30_59_days IS NULL) AS number_times_30_59_nulos,
+ COUNTIF(debt_ratio IS NULL) AS debt_ratio_nulos,
+ COUNTIF(number_times_delayed_payment_loan_60_89_days IS NULL) AS number_times_60_89_nulos
+FROM `riesgo-relativo-429716.dataset.loans_detail`;
+```
+![image](https://github.com/user-attachments/assets/679531a8-7f0b-45fa-a704-00477ccccd69)
+
+
+🚩 default
+
+```sql
+SELECT
+ COUNTIF(user_id IS NULL) AS user_id_nulos,
+ COUNTIF(default_flag IS NULL) AS default_flag_nulos
+FROM `riesgo-relativo-429716.dataset.default`;
+```
+![image](https://github.com/user-attachments/assets/c537f304-1011-47ec-8366-42757b0ba7b2)
+
+
+
+## 2.23 Identificar y manejar valores duplicados
+
+*Sin duplicados
+
+👤 user_info: 
+```sql
+SELECT
+  user_id,
+  COUNT(*) AS num_duplicates
+FROM `riesgo-relativo-429716.dataset.user_info`
+GROUP BY user_id
+HAVING num_duplicates > 1;
+```
+
+![image](https://github.com/user-attachments/assets/f475cd13-198c-4e31-b547-fb61024c62c2)
+
+💰 loans_outstanding : sin nulos
+```sql
+SELECT
+  loan_id,
+  user_id,
+  COUNT(*) AS num_duplicates
+FROM `riesgo-relativo-429716.dataset.loans_outstanding`
+GROUP BY loan_id, user_id
+HAVING num_duplicates > 1;
+```
+![image](https://github.com/user-attachments/assets/f475cd13-198c-4e31-b547-fb61024c62c2)
+
+📑 loans_detail
+```sql
+SELECT
+  user_id,
+  COUNT(*) AS num_duplicates
+FROM `riesgo-relativo-429716.dataset.loans_detail`
+GROUP BY user_id
+HAVING num_duplicates > 1;
+```
+![image](https://github.com/user-attachments/assets/1f0009fe-d18d-4689-a66a-8b150dde4953)
+
+🚩 default
+```sql
+SELECT
+  user_id,
+  COUNT(*) AS num_duplicates
+FROM `riesgo-relativo-429716.dataset.default`
+GROUP BY user_id
+HAVING num_duplicates > 1;
+```
+
+![image](https://github.com/user-attachments/assets/bf348f51-426c-4a01-aaf8-8c4894ee3dc6)
+
 
 
