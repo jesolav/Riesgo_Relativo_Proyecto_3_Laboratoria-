@@ -705,13 +705,10 @@ Los histogramas muestran la distribución de frecuencias de los salarios para ca
 *Los valores atípicos deben ser investigados más a fondo para determinar si son errores de datos o representan casos reales.
 
 
-
-****
-
+## 2.6  Comprobar y cambiar tipo de dato
 
 
-## 2.6 Identificar y manejar datos discrepantes en variables numéricas
-
+## 2.7 Crear nuevas variables
 
 
 ```sql
