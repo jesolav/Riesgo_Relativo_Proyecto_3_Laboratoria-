@@ -710,6 +710,170 @@ Los histogramas muestran la distribución de frecuencias de los salarios para ca
 
 ## 2.7 Crear nuevas variables
 
+Para continuar nuestro analisis, creamos nuevas variables:
+
+## **Variables Derivadas de user_info:**
+
+* **age_group (Rango de Edad):** Analizar si el riesgo de incumplimiento varía según la edad del solicitante, ya que diferentes grupos de edad pueden tener diferentes comportamientos financieros.
+Valores: Categorías como "18-29", "30-39", "40-49", "50-59" y "60+".
+
+* **salary_per_dependent (Relación Salario/Dependientes):** Evaluar la capacidad de pago del solicitante en relación con sus responsabilidades familiares, ya que un salario más alto por dependiente puede indicar una mayor capacidad para cumplir con los pagos del préstamo.
+Valores: Números reales que representan el salario mensual dividido por el número de dependientes (o 1 si no hay dependientes).
+
+* **income_group (Rango de Ingresos):** Examinar si el nivel de ingresos del solicitante afecta su probabilidad de incumplimiento, ya que los ingresos pueden estar relacionados con la estabilidad financiera.
+Valores: Categorías como "Bajo", "Medio" y "Alto" (los límites de los rangos pueden ajustarse según tus datos).
+
+## **Variables Derivadas de loans_detail:**
+
+* **total_delays (Total de Retrasos en Pagos):** Obtener una medida global del historial de retrasos del solicitante, ya que un mayor número de retrasos puede indicar un mayor riesgo de incumplimiento.
+Valores: Números enteros que representan la suma de los retrasos en pagos de 30-59 días y 60-89 días.
+
+## **Variables Derivadas de loans_outstanding:**
+
+* **num_loans_outstanding (Número de Préstamos Pendientes):** Evaluar si la cantidad de préstamos pendientes afecta el riesgo de incumplimiento, ya que tener múltiples préstamos podría indicar una mayor carga financiera.
+Valores: Números enteros que representan la cantidad de préstamos pendientes por usuario.
+
+* **most_common_loan_type (Tipo de Préstamo Más Común):** Identificar el tipo de préstamo que el solicitante utiliza con mayor frecuencia, ya que ciertos tipos de préstamos podrían estar asociados a un mayor riesgo.
+Valores: Categorías que representan los diferentes tipos de préstamo (por ejemplo, "Personal", "Automóvil", etc.).
+
+
+Calcularemos nuevamente la correlación:
+```sql
+SELECT
+  corr(d.default_flag, ui.age) AS corr_default_age,
+  corr(d.default_flag, ui.salary_per_dependent) AS corr_default_salary_per_dependent, -- Nueva
+  corr(d.default_flag, ld.total_delays) AS corr_default_total_delays, -- Nueva
+  corr(d.default_flag, ld.more_90_days_overdue) AS corr_default_more_90_days_overdue,
+  corr(d.default_flag, ld.using_lines_not_secured_personal_assets) AS corr_default_using_lines,
+  corr(d.default_flag, ld.number_times_delayed_payment_loan_30_59_days) AS corr_default_delays_30_59,
+  corr(d.default_flag, ld.debt_ratio) AS corr_default_debt_ratio,
+  corr(d.default_flag, ld.number_times_delayed_payment_loan_60_89_days) AS corr_default_delays_60_89
+FROM 
+  `riesgo-relativo-429716.dataset.default` d
+JOIN 
+  `riesgo-relativo-429716.dataset.user_info` ui ON d.user_id = ui.user_id
+JOIN 
+  `riesgo-relativo-429716.dataset.loans_detail` ld ON d.user_id = ld.user_id;
+```
+
+![image](https://github.com/user-attachments/assets/082d7374-4d82-4a92-94aa-4edd88ecfd25)
+
+**Correlaciones Positivas:**
+
+* corr_default_total_delays (0.29): Existe una correlación positiva moderada entre el total de retrasos en pagos y la probabilidad de incumplimiento. Esto significa que a medida que aumenta el número de retrasos, también aumenta la probabilidad de que el cliente incumpla.
+* corr_default_more_90_days_overdue (0.31): La correlación positiva más fuerte se observa con la variable que indica si el cliente ha tenido retrasos de más de 90 días. Esto sugiere que los retrasos prolongados son un indicador muy importante del riesgo de incumplimiento.
+* corr_default_delays_30_59 (0.30): También hay una correlación positiva moderada con el número de retrasos de 30 a 59 días, lo que indica que incluso los retrasos más cortos pueden ser relevantes para predecir el incumplimiento.
+* corr_default_delays_60_89 (0.28): Similar a la anterior, esta correlación muestra que los retrasos de 60 a 89 días también están asociados con un mayor riesgo de incumplimiento.
+
+**Correlaciones Negativas:**
+
+* corr_default_age (-0.08): Hay una correlación negativa débil entre la edad y el incumplimiento. Esto sugiere que, en general, los clientes más jóvenes podrían tener una probabilidad ligeramente mayor de incumplir en comparación con los clientes mayores.
+* corr_default_salary_per_dependent (-0.04): La correlación negativa más débil se observa con la relación salario/dependientes. Esto indica que, aunque no es muy fuerte, podría haber una tendencia a que los clientes con un salario más bajo por dependiente tengan un riesgo ligeramente mayor de incumplimiento.
+* Correlación Casi Nula:
+
+* corr_default_using_lines (0.003): La correlación entre el uso de líneas de crédito no garantizadas y el incumplimiento es prácticamente nula. Esto sugiere que esta variable no es un buen predictor del riesgo de incumplimiento en este conjunto de datos.
+
+
+**Conclusiones:**
+
+* El historial de retrasos en pagos, especialmente los retrasos de más de 90 días, son los predictores más fuertes del incumplimiento en este análisis.
+* La edad y la relación salario/dependientes tienen una influencia menor, pero aún podrían ser relevantes para el modelo de riesgo crediticio.
+* El uso de líneas de crédito no garantizadas no parece estar relacionado con el riesgo de incumplimiento en este caso.
+
+## 2.8 Unión de tablas
+
+Esta consulta dará una tabla con una fila por cada usuario en default, incluyendo todas las variables creadas y las originales relevantes para tu análisis de riesgo crediticio.
+
+
+```sql
+CREATE TABLE `riesgo-relativo-429716.dataset.datos_unidos` AS
+SELECT
+  d.user_id,
+  d.default_flag,
+  ui.age,
+  ui.sex,
+  ui.age_group,
+  ui.income_group,
+  ld.more_90_days_overdue,
+  ld.using_lines_not_secured_personal_assets,
+  ld.number_times_delayed_payment_loan_30_59_days AS delays_30_59,
+  ld.debt_ratio,
+  ld.number_times_delayed_payment_loan_60_89_days AS delays_60_89,
+  ld.total_delays,
+  lo.num_loans_outstanding,
+  mclt.loan_type AS most_common_loan_type
+FROM `riesgo-relativo-429716.dataset.default` d
+LEFT JOIN `riesgo-relativo-429716.dataset.user_info` ui ON d.user_id = ui.user_id
+LEFT JOIN `riesgo-relativo-429716.dataset.loans_detail` ld ON d.user_id = ld.user_id
+LEFT JOIN (
+  SELECT user_id, COUNT(*) AS num_loans_outstanding
+  FROM `riesgo-relativo-429716.dataset.loans_outstanding`
+  GROUP BY user_id
+) lo ON d.user_id = lo.user_id
+LEFT JOIN `riesgo-relativo-429716.dataset.most_common_loan_type` mclt ON d.user_id = mclt.user_id;
+```
+Al realizar esta consulta nos encontramos con 452 filas con nulos en diferentes columnas. Esto representa un 1.3% de nuestro dataset, por lo que decidimos crear una nueva tabla sin nulos, para continuar nuestro analisis.
+
+```sql
+SELECT
+    *
+  FROM
+    `riesgo-relativo-429716.dataset.all_data` AS all_data
+  WHERE all_data.age IS NULL
+   OR all_data.sex IS NULL
+   OR all_data.age_group IS NULL
+   OR all_data.income_group IS NULL
+   OR all_data.more_90_days_overdue IS NULL
+   OR all_data.using_lines_not_secured_personal_assets IS NULL
+   OR all_data.delays_30_59 IS NULL
+   OR all_data.debt_ratio IS NULL
+   OR all_data.delays_60_89 IS NULL
+   OR all_data.total_delays IS NULL
+   OR all_data.loan_id IS NULL
+   OR all_data.loan_type IS NULL
+   OR all_data.num_loans IS NULL
+   OR all_data.most_common_loan_type IS NULL;
+```
+![image](https://github.com/user-attachments/assets/9cb7dfb6-e76e-4765-891b-2ee0cddb674c)
+
+
+## 2.9 Crear tablas auxiliares
+
+Se crea una nueva tabla auxiliar, con todos los datos sin considerar nulos.
+
+```sql
+CREATE TABLE `riesgo-relativo-429716.dataset.all_data_no_nulls` AS
+SELECT *
+FROM `riesgo-relativo-429716.dataset.all_data`
+WHERE age IS NOT NULL
+  AND sex IS NOT NULL
+  AND age_group IS NOT NULL
+  AND income_group IS NOT NULL
+  AND more_90_days_overdue IS NOT NULL
+  AND using_lines_not_secured_personal_assets IS NOT NULL
+  AND delays_30_59 IS NOT NULL
+  AND debt_ratio IS NOT NULL
+  AND delays_60_89 IS NOT NULL
+  AND total_delays IS NOT NULL
+  AND loan_id IS NOT NULL
+  AND loan_type IS NOT NULL
+  AND num_loans IS NOT NULL
+  AND most_common_loan_type IS NOT NULL;
+```
+
+
+
+```sql
+```
+
+```sql
+```
+
+```sql
+```
+
+```sql
+```
 
 ```sql
 ```
