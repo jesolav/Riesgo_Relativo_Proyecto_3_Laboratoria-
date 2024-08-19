@@ -1,64 +1,221 @@
-## *Hipótesis 3: La presencia de una canción en un mayor número de playlists se relaciona con un mayor número de streams*
+## 2.2. Identificar y manejar valores nulos y duplicados
 
-*Coeficiente correlación total playlists y streams:*
 
-![image](https://github.com/user-attachments/assets/23325d7f-228d-463e-9856-45d2b08ad7af)
+👤 user_info: 
 
-Consulta en sql:
-```sql 
-SELECT CORR(total_playlists, streams) AS correlation_value
-FROM `proyecto-hipotesis-427018.hipotesis.tabla_matriz`
+  Sin duplicados, solo nulos en : 
+  
+    -last_month_salary:7199
+    -number_dependents: 943
+
+```sql
+WITH total_rows AS (
+  SELECT COUNT(*) AS total_rows
+  FROM `riesgo-relativo-429716.dataset.user_info`
+),
+null_counts AS (
+  SELECT
+    COUNTIF(user_id IS NULL) AS user_id_nulos,
+    COUNTIF(age IS NULL) AS age_nulos,
+    COUNTIF(sex IS NULL) AS sex_nulos,
+    COUNTIF(last_month_salary IS NULL) AS last_month_salary_nulos,
+    COUNTIF(number_dependents IS NULL) AS number_dependents_nulos
+  FROM `riesgo-relativo-429716.dataset.user_info`
+),
+duplicate_counts AS (
+  SELECT
+    COALESCE(CAST(user_id AS STRING), 'NULL_USER') AS user_id,
+    COUNT(*) AS num_duplicates
+  FROM `riesgo-relativo-429716.dataset.user_info`
+  GROUP BY COALESCE(CAST(user_id AS STRING), 'NULL_USER')
+  HAVING num_duplicates > 1
+)
+SELECT
+  total_rows.total_rows,
+  null_counts.user_id_nulos,
+  null_counts.age_nulos,
+  null_counts.sex_nulos,
+  null_counts.last_month_salary_nulos,
+  null_counts.number_dependents_nulos,
+  duplicate_counts.user_id,
+  duplicate_counts.num_duplicates
+FROM
+  total_rows,
+  null_counts
+LEFT JOIN
+  duplicate_counts
+ON null_counts.user_id_nulos IS NOT NULL OR duplicate_counts.user_id IS NOT NULL;
 ```
+![image](https://github.com/user-attachments/assets/7023aad3-f36b-48a8-a4a8-99754d5cafde)
 
-El coeficiente de correlación de 0.6047 confirma la relación positiva observada en el gráfico. Este valor indica una correlación moderadamente fuerte, lo que sugiere que la presencia en playlists es un predictor razonablemente bueno del número de streams, pero no el único factor determinante.
+Para analizar estos nulos se creo una nueva consulta que busca analizar la relación entre el salario de los clientes y su probabilidad de incumplimiento (default). Para ello, divide a los clientes en dos grupos según tengan o no un salario registrado y luego calcula, para cada grupo, la cantidad y proporción de clientes que han incumplido con sus pagos. Esto permite evaluar si la falta de información sobre el salario es un factor relevante en la predicción del riesgo crediticio. Por el momento, se mantendran 
 
-*Lo graficamos en power bi con python*
+1. La consulta (CTE):
 
-```phyton
-import matplotlib.pyplot as plt
-import numpy as np
+WITH datos_unidos AS (...):  Esto es una Common Table Expression (CTE), que crea una tabla temporal llamada datos_unidos. Piensa en ella como una subconsulta que puedes referenciar más adelante.
 
-# Personalización de colores y estilo
-fig, ax = plt.subplots(figsize=(10, 6), facecolor='#000000')
-ax.set_facecolor('#896FF780')
+SELECT ui.user_id, ui.last_month_salary, d.default_flag: La CTE selecciona tres columnas:
 
-# Cálculo de la línea de tendencia
-z = np.polyfit(dataset['total_playlists'], dataset['streams'], 1)
-p = np.poly1d(z)
+user_id de la tabla user_info.
+last_month_salary de la tabla user_info.
+default_flag de la tabla default.
+FROM user_info AS ui LEFT JOIN default AS d ON ui.user_id = d.user_id:  Realiza un LEFT JOIN, que combina información de ambas tablas basándose en la coincidencia del user_id. La diferencia clave es que un LEFT JOIN incluye todas las filas de la tabla de la izquierda (user_info), incluso si no tienen coincidencias en la tabla de la derecha (default). En este caso, si un usuario no tiene un registro en default, se mostrará como NULL en la columna default_flag.
 
-# Gráfico de dispersión
-plt.scatter(dataset['total_playlists'], dataset['streams'], alpha=0.5, color='#9071CE')
+2. La consulta principal:
 
-# Línea de tendencia
-plt.plot(dataset['total_playlists'], p(dataset['total_playlists']), linestyle='--', color='white')
+SELECT CASE WHEN last_month_salary IS NULL THEN 'Sin Salario' ELSE 'Con Salario' END AS tiene_salario:  Crea una nueva columna llamada tiene_salario que categoriza a los usuarios como "Con Salario" si tienen un valor en last_month_salary y "Sin Salario" si este valor es nulo.
 
-# Configuración de textos y etiquetas
-plt.title('Relación entre Popularidad en Total Playlists y Streams', fontsize=18, color='white', fontname='Calibri')
-plt.xlabel('total_playlists', color='white', fontname='Calibri')
-plt.ylabel('Streams', color='white', fontname='Calibri')
+default_flag: Selecciona la columna default_flag (que indica si el cliente ha incumplido).
 
-# Configuración de ejes y cuadrícula
-plt.xlim([dataset['total_playlists'].min(), dataset['total_playlists'].max()])
-plt.ylim([dataset['streams'].min(), dataset['streams'].max()])
-plt.xticks(color='white', fontname='Calibri')
-plt.yticks(color='white', fontname='Calibri')
-plt.grid(True, alpha=0.3)
+COUNT(*) AS cantidad_clientes: Cuenta el número de filas (clientes) en cada grupo.
 
-# Mostrar el gráfico
-plt.show()
+COUNT(*) / SUM(COUNT(*)) OVER () AS proporcion_clientes: Calcula la proporción de clientes en cada grupo respecto al total.  SUM(COUNT(*)) OVER () calcula el total de clientes en todas las categorías, y luego cada grupo se divide por ese total.
+
+GROUP BY tiene_salario, default_flag:  Agrupa los resultados por las columnas tiene_salario y default_flag.
+
+ORDER BY tiene_salario, default_flag:  Ordena los resultados primero por tiene_salario y luego por default_flag.
+
+
+```sql
+WITH datos_unidos AS (
+ SELECT
+  ui.user_id,
+  ui.last_month_salary,
+  d.default_flag
+ FROM `riesgo-relativo-429716.dataset.user_info` AS ui
+ LEFT JOIN `riesgo-relativo-429716.dataset.default` AS d
+  ON ui.user_id = d.user_id
+)
+
+SELECT
+ CASE 
+  WHEN last_month_salary IS NULL THEN 'Sin Salario'
+  ELSE 'Con Salario'
+ END AS tiene_salario,
+ default_flag,
+ COUNT(*) AS cantidad_clientes,
+ COUNT(*) / SUM(COUNT(*)) OVER () AS proporcion_clientes
+FROM datos_unidos
+GROUP BY tiene_salario, default_flag
+ORDER BY tiene_salario, default_flag;
 ```
+![image](https://github.com/user-attachments/assets/e766dc12-cea8-44be-bbbb-14e19531e9b5)
 
-![image](https://github.com/user-attachments/assets/dd394b0f-f5db-4867-9073-fba651deb79e)
+Interpretación:
+
+* La mayoría de los clientes (78.47%) tienen salario registrado y no han incumplido.
+* Un pequeño porcentaje (1.54%) tiene salario registrado y ha incumplido.
+* Un porcentaje significativo (19.63%) no tiene salario registrado y no ha incumplido.
+* Un porcentaje muy pequeño (0.36%) no tiene salario registrado y ha incumplido.
+
+Conclusión:
+
+Esta consulta nos da una visión general de cómo se relacionan el salario registrado (o la falta de él) con el incumplimiento de los clientes. Es un buen punto de partida para un análisis más profundo del riesgo crediticio.
 
 
+💰 loans_outstanding : sin nulos
 
-**Análisis del gráfico:**
+```sql
+WITH null_counts_loans_outstanding AS (
+  SELECT
+    COUNT(*) AS total_rows,
+    COUNTIF(loan_id IS NULL) AS loan_id_nulls,
+    COUNTIF(user_id IS NULL) AS user_id_nulls,
+    COUNTIF(loan_type IS NULL) AS loan_type_nulls
+  FROM `riesgo-relativo-429716.dataset.loans_outstanding`
+),
+duplicate_counts_loans_outstanding AS (
+  SELECT
+    COALESCE(CAST(loan_id AS STRING), 'NULL_LOAN') AS loan_id,
+    COALESCE(CAST(user_id AS STRING), 'NULL_USER') AS user_id,
+    COUNT(*) AS num_duplicates
+  FROM `riesgo-relativo-429716.dataset.loans_outstanding`
+  GROUP BY COALESCE(CAST(loan_id AS STRING), 'NULL_LOAN'), COALESCE(CAST(user_id AS STRING), 'NULL_USER')
+  HAVING num_duplicates > 1
+)
+SELECT
+  null_counts_loans_outstanding.total_rows,
+  null_counts_loans_outstanding.loan_id_nulls,
+  null_counts_loans_outstanding.user_id_nulls,
+  null_counts_loans_outstanding.loan_type_nulls,
+  duplicate_counts_loans_outstanding.loan_id,
+  duplicate_counts_loans_outstanding.user_id,
+  duplicate_counts_loans_outstanding.num_duplicates
+FROM
+  null_counts_loans_outstanding
+LEFT JOIN
+  duplicate_counts_loans_outstanding
+ON null_counts_loans_outstanding.loan_id_nulls IS NOT NULL 
+OR duplicate_counts_loans_outstanding.loan_id IS NOT NULL;
+```
+![image](https://github.com/user-attachments/assets/668dd430-29c4-4799-8c22-3826075b4a52)
 
-* **Tendencia positiva**: El gráfico de dispersión muestra una clara tendencia ascendente, lo que indica que a medida que aumenta el número de playlists en las que aparece una canción, también tiende a aumentar su número de streams.
-* **Dispersión**: Aunque hay una tendencia general, también hay una dispersión considerable de los puntos alrededor de la línea de tendencia. Esto significa que si bien hay una relación positiva, no es perfecta y hay excepciones. Algunas canciones pueden tener muchos streams sin estar en muchas playlists, y viceversa.
 
-**Conclusión:**
+📑 loans_detail
 
-Basándonos en el gráfico y el coeficiente de correlación, podemos concluir que la tercera hipótesis es válida: existe una relación positiva moderadamente fuerte entre la presencia de una canción en playlists y su número de streams. Esto significa que las canciones que aparecen en más playlists tienden a tener más streams, aunque hay excepciones y otros factores también influyen en la popularidad de una canción.
+```sql
+WITH null_counts_loans_detail AS (
+  SELECT
+    COUNT(*) AS total_rows,
+    COUNTIF(user_id IS NULL) AS user_id_nulls,
+    COUNTIF(number_times_delayed_payment_loan_30_59_days IS NULL) AS loan_identifier_nulls
+  FROM `riesgo-relativo-429716.dataset.loans_detail`
+),
+duplicate_counts_loans_detail AS (
+  SELECT
+    COALESCE(CAST(user_id AS STRING), 'NULL_USER') AS user_id,
+    number_times_delayed_payment_loan_30_59_days AS loan_identifier,
+    COUNT(*) AS num_duplicados
+  FROM
+    `riesgo-relativo-429716.dataset.loans_detail`
+  GROUP BY
+    COALESCE(CAST(user_id AS STRING), 'NULL_USER'), loan_identifier
+  HAVING
+    COUNT(*) > 1
+)
+SELECT
+  null_counts_loans_detail.total_rows,
+  null_counts_loans_detail.user_id_nulls,
+  null_counts_loans_detail.loan_identifier_nulls,
+  duplicate_counts_loans_detail.user_id,
+  duplicate_counts_loans_detail.loan_identifier,
+  duplicate_counts_loans_detail.num_duplicados
+FROM
+  null_counts_loans_detail
+LEFT JOIN
+  duplicate_counts_loans_detail
+ON null_counts_loans_detail.user_id_nulls IS NOT NULL OR duplicate_counts_loans_detail.user_id IS NOT NULL;
+```
+![image](https://github.com/user-attachments/assets/4d1dd15c-dbde-48bd-84c1-371dec81f033)
 
+
+🚩 default
+
+```sql
+WITH null_counts_default AS (
+ SELECT
+  COUNT(*) AS total_rows,
+  COUNTIF(user_id IS NULL) AS user_id_nulls,
+  COUNTIF(default_flag IS NULL) AS default_flag_nulls
+ FROM `riesgo-relativo-429716.dataset.default`
+),
+duplicate_counts_default AS (
+ SELECT
+  user_id,
+  COUNT(*) AS num_duplicates
+ FROM `riesgo-relativo-429716.dataset.default`
+ GROUP BY user_id
+ HAVING num_duplicates > 1
+)
+SELECT
+ null_counts_default.total_rows,
+ null_counts_default.user_id_nulls,
+ null_counts_default.default_flag_nulls,
+ duplicate_counts_default.user_id,
+ duplicate_counts_default.num_duplicates
+FROM
+ null_counts_default,
+ duplicate_counts_default;
+```
+![image](https://github.com/user-attachments/assets/c80a0665-3485-4c3d-9431-da3c832416cf)
 
