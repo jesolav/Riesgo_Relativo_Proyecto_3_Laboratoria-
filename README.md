@@ -71,7 +71,34 @@ Trabajo individual
 </details>
 
 
-### 2. Hito 1
+
+## Temas
+
+* Caso
+* Herramientas y Recursos
+* Lenguajes
+* Conjunto de datos
+* Procesamiento y preparación de datos
+* Importación y Creación de Tablas en BigQuery
+* Identificación y Manejo de Valores Nulos
+* Tratamiento de Valores Nulos
+* Identificación y Manejo de Duplicados
+* Outliers
+* Tratamiento de Outliers
+* Correlaciones
+* Variables Creadas
+* Hipótesis
+* Análisis de Riesgo de Crédito
+* Creación de Variables Dummies
+* Cálculo del Score de Riesgo
+* Matriz de Confusión y Evaluación del Modelo
+* Resultados
+* Conclusiones y recomendaciones
+* Recursos
+
+
+
+### 💻 [Procesamiento y preparación para analisis de datos:] (
 
 ## 2.1 Conectar/importar datos a herramientas
 
