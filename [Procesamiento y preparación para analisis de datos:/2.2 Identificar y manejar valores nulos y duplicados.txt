@@ -43,6 +43,7 @@ LEFT JOIN
   duplicate_counts
 ON null_counts.user_id_nulos IS NOT NULL OR duplicate_counts.user_id IS NOT NULL;
 ```
+
 ![image](https://github.com/user-attachments/assets/7023aad3-f36b-48a8-a4a8-99754d5cafde)
 
 Para analizar estos nulos se creo una nueva consulta que busca analizar la relación entre el salario de los clientes y su probabilidad de incumplimiento (default). Para ello, divide a los clientes en dos grupos según tengan o no un salario registrado y luego calcula, para cada grupo, la cantidad y proporción de clientes que han incumplido con sus pagos. Esto permite evaluar si la falta de información sobre el salario es un factor relevante en la predicción del riesgo crediticio. Por el momento, se mantendran 
