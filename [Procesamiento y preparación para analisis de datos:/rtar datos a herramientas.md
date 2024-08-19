@@ -1,5 +1,36 @@
-## 2.1 Conectar/importar datos a herramientas
+## 2.10 Crear tablas auxiliares
 
-![image](https://github.com/user-attachments/assets/757945bf-d7cc-4e84-823e-a81595fd7035)
+Se crea una nueva tabla auxiliar, con todos los datos sin considerar nulos.
 
-Objetivo: Utilizar la interfaz de Google BigQuery para crear las 4 tablas (1 por cada archivo)
+```sql
+CREATE OR REPLACE TABLE riesgo-relativo-429716.dataset.all_data AS
+SELECT
+    t1.user_id,
+    t1.age,
+    t1.sex,
+    t1.last_month_salary,
+    t1.number_dependents,
+    t1.age_group,
+    t1.salary_per_dependent,
+    t1.income_group,
+    t2.default_flag,
+    t3.loan_type,
+    t3.num_loans,
+    t4.more_90_days_overdue,
+    t4.using_lines_not_secured_personal_assets,
+    t4.number_times_delayed_payment_loan_30_59_days,
+    t4.debt_ratio,
+    t4.number_times_delayed_payment_loan_60_89_days,
+    t4.total_delays,
+    t4.delays,
+    t5.loan_id,
+    t6.loan_type AS most_common_loan_type
+  FROM
+    `riesgo-relativo-429716.dataset.user_info` AS t1
+    INNER JOIN `riesgo-relativo-429716.dataset.default` AS t2 ON t1.user_id = t2.user_id
+    INNER JOIN `riesgo-relativo-429716.dataset.loan_counts` AS t3 ON t2.user_id = t3.user_id
+    INNER JOIN `riesgo-relativo-429716.dataset.loans_detail` AS t4 ON t3.user_id = t4.user_id
+    INNER JOIN `riesgo-relativo-429716.dataset.loans_outstanding` AS t5 ON t4.user_id = t5.user_id
+    INNER JOIN `riesgo-relativo-429716.dataset.most_common_loan_type` AS t6 ON t5.user_id = t6.user_id
+```
+
