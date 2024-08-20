@@ -72,11 +72,6 @@ Trabajo individual
 
 
 
-* Conclusiones y recomendaciones
-* Recursos
-
-
-
 ### 💻 [Procesamiento y preparación para analisis de datos:] 
 
 2.1. [Conectar/importar datos a herramientas](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/01d3cde026e2852c46698d89d54d617758d478b1/%5BProcesamiento%20y%20preparaci%C3%B3n%20para%20analisis%20de%20datos%3A/2.1%20Conectar%20e%20importar%20datos%20a%20herramientas.md)
