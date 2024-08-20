@@ -98,7 +98,7 @@ Trabajo individual
 
 
 
-### 💻 [Procesamiento y preparación para analisis de datos:] (
+### 💻 [Procesamiento y preparación para analisis de datos:] 
 
 2.1. [Conectar/importar datos a herramientas](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/01d3cde026e2852c46698d89d54d617758d478b1/%5BProcesamiento%20y%20preparaci%C3%B3n%20para%20analisis%20de%20datos%3A/2.1%20Conectar%20e%20importar%20datos%20a%20herramientas.md)
 
@@ -121,20 +121,18 @@ Trabajo individual
 
 2.10  [Crear tablas auxiliares](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/05b2b43bff156a5dc57bfc1c87aafcb935a91b90/%5BProcesamiento%20y%20preparaci%C3%B3n%20para%20analisis%20de%20datos%3A/rtar%20datos%20a%20herramientas.md)
 
-### 💻 [Hacer un análisis exploratorio:] (
+### 💻 [Hacer un análisis exploratorio:] 
+
+3.1  [Agrupar datos según variables categóricas](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/92217673926d10ca511e1b80405d5804d13baa2d/Analisis%20exploratorio/3.1%20Agrupar%20datos%20segun%20variables%20categoricas.md)
+
+3.2  [Medidas de Tendencia Central](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/92217673926d10ca511e1b80405d5804d13baa2d/Analisis%20exploratorio/3.2%20Medidas%20de%20Tendencia%20Central.md)
 
 
-```sql
-```
+3.3  [Distribución de Variables](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/2cec995c99fabff285b2bd1de25258ba87168d95/Analisis%20exploratorio/5.%20Medidas%20Tendencia%20Central%2C%20Histograma.md)
 
-```sql
-```
+3.4  [Distribución de Variables](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/4d5d3036f57f384bed206c5938484a3c358101cd/Analisis%20exploratorio/3.4%20Correlacion%20de%20variables.md)
 
-```sql
-```
+3.5  [Análisis de Riesgo Relativo](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/746e3b28390b19fee43aef27b4536994d1bde2f2/Analisis%20exploratorio/3.5%20Analisis%20de%20riesgo%20relativo.md)
 
-```sql
-```
 
-```sql
-```
+
