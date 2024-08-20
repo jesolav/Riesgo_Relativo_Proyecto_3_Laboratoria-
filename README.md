@@ -72,27 +72,6 @@ Trabajo individual
 
 
 
-## Temas
-
-* Caso
-* Herramientas y Recursos
-* Lenguajes
-* Conjunto de datos
-* Procesamiento y preparación de datos
-* Importación y Creación de Tablas en BigQuery
-* Identificación y Manejo de Valores Nulos
-* Tratamiento de Valores Nulos
-* Identificación y Manejo de Duplicados
-* Outliers
-* Tratamiento de Outliers
-* Correlaciones
-* Variables Creadas
-* Hipótesis
-* Análisis de Riesgo de Crédito
-* Creación de Variables Dummies
-* Cálculo del Score de Riesgo
-* Matriz de Confusión y Evaluación del Modelo
-* Resultados
 * Conclusiones y recomendaciones
 * Recursos
 
@@ -121,7 +100,7 @@ Trabajo individual
 
 2.10  [Crear tablas auxiliares](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/05b2b43bff156a5dc57bfc1c87aafcb935a91b90/%5BProcesamiento%20y%20preparaci%C3%B3n%20para%20analisis%20de%20datos%3A/rtar%20datos%20a%20herramientas.md)
 
-### 💻 [Hacer un análisis exploratorio:] 
+### 🔎 [Hacer un análisis exploratorio:] 
 
 3.1  [Agrupar datos según variables categóricas](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/92217673926d10ca511e1b80405d5804d13baa2d/Analisis%20exploratorio/3.1%20Agrupar%20datos%20segun%20variables%20categoricas.md)
 
@@ -134,5 +113,14 @@ Trabajo individual
 
 3.5  [Análisis de Riesgo Relativo](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/746e3b28390b19fee43aef27b4536994d1bde2f2/Analisis%20exploratorio/3.5%20Analisis%20de%20riesgo%20relativo.md)
 
+3.6  [Conclusiones y Recomendaciones](https://github.com/jesolav/Riesgo_Relativo_Proyecto_3_Laboratoria-/blob/4003a58550bbab25fd03fa0778c8396bcf15b0fe/Analisis%20exploratorio/Conclusiones%20y%20Recomendaciones.md)
 
+
+### 💡 [Enlaces de interés:] 
+
+4.1  [Presentación](https://drive.google.com/file/d/1qTROgofJwOVIb8ihu9XAzY6DbjZTQnKD/view?usp=drive_link)
+
+4.2  [Video Presentación](https://www.loom.com/share/8d09cec8d17e46179fdeaa6a2e9d2c5e?sid=dbeda798-6c5d-4c22-9cd8-5792b0ddfb3b)
+
+4.3  [Dashboard](https://lookerstudio.google.com/reporting/783574cd-6c27-4337-b754-5acadf92ab04)
 
