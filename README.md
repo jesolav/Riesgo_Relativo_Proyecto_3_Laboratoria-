@@ -119,3 +119,5 @@ Trabajo individual
 
 4.3  [Dashboard](https://lookerstudio.google.com/reporting/783574cd-6c27-4337-b754-5acadf92ab04)
 
+4.4  [Notebook Google Colab](https://drive.google.com/file/d/1UmyWgCtzHfJscbuAHnGrlSwQOrDjWcTs/view?usp=drive_link)
+
